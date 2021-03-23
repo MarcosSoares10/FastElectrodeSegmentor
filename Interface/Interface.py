@@ -310,30 +310,6 @@ class InterfaceLogic(ScriptedLoadableModuleLogic):
     logging.info('Processing started')
 
      
-    #volmn = sitkUtils.PullVolumeFromSlicer(inputVolume.GetID())
-    #logging.info('A')
-    #auximg=sitk.Cast(sitk.RescaleIntensity(volmn), sitk.sitkUInt8)
-    #logging.info('B')
-    #volumesLogic = slicer.modules.volumes.logic()
-    #rescaledinputimage = volumesLogic.CloneVolume(slicer.mrmlScene, outputVolume, 'Rescaled Input Image')
-    #thresholdedVolumeNode = volumesLogic.CloneVolume(slicer.mrmlScene, outputVolume, 'Thresholded Image')
-    #print auximg.GetWidth()
-    #print auximg.GetHeight()
-    #print auximg.GetDepth()
-    #print auximg.GetOrigin()
-    #print auximg.GetSpacing()
-    #print auximg.GetDirection()
-    
-
-    
-    #sitkUtils.PushVolumeToSlicer(auximg, rescaledinputimage.GetID())
-    
-    #Corregistro CT MRI
-    #ROBEX
-    #SEGMENTAR ELETRODOS
-    #SEGMENTAR TECIDOS CEREBRO
-    #RECONSTRUCAO 3D
-    
 
 
   ###################################################################################################################### 
@@ -371,9 +347,6 @@ class InterfaceLogic(ScriptedLoadableModuleLogic):
 
     
 
-    
-
-    ############################################DESATIVEDFORTEST######################################################
 
     if inputMRIVolume is None:
         namemriaux= "MRI_ATLAS_"+str(now.strftime("%m%d%Y_%H%M%S"))
@@ -446,20 +419,14 @@ class InterfaceLogic(ScriptedLoadableModuleLogic):
     cliParams = {'InputVolume': inputVolume.GetID(), 'MaskVolume': brainmask.GetID(), 'OutputVolume': PreprocessesCT.GetID()}
     cliNode = slicer.cli.run(slicer.modules.maskscalarvolume, None, cliParams, wait_for_completion=True)
     
-    ############################################DESATIVEDFORTEST######################################################
+
 
     electrodeslabelimage = volumesLogic.CreateAndAddLabelVolume( slicer.mrmlScene, inputVolume, "electrodes" )
-    #cliParams = {'inputVolume': inputVolume.GetID(), 'outputVolume': electrodeslabelimage.GetID(),'threshold' : Thresholdvalue,'datPath' : self.electrodefilepath}
-    
+  
     cliParams = {'inputVolume': PreprocessesCT.GetID(), 'outputVolume': electrodeslabelimage.GetID(),'threshold' : Thresholdvalue,'datPath' : self.electrodefilepath}
     
     cliNode = slicer.cli.run(slicer.modules.fastelectrodesegmentor, None, cliParams, wait_for_completion=True)
-    #cliNode = slicer.cli.run(slicer.modules.fastelectrodesegmentorsquare, None, cliParams, wait_for_completion=True)
-    #cliNode = slicer.cli.run(slicer.modules.fastelectrodesegmentorcircle, None, cliParams, wait_for_completion=True)
 
-    #now = datetime.now()
-    #nameaux= "BRAIN_"+str(now.strftime("%m%d%Y_%H%M%S"))
-    #slicer.util.loadVolume(self.tmpOutputFile, {'name': nameaux})
     
     Brain3D = volumesLogic.CreateAndAddLabelVolume( slicer.mrmlScene, BrainCropVolume, "Brain3D" )
     cliParams = {'inputVolume': BrainCropVolume.GetID(), 'outputVolume': Brain3D.GetID()}
@@ -470,12 +437,7 @@ class InterfaceLogic(ScriptedLoadableModuleLogic):
     #Rendering Electrodes
     self.makeModel(Brain3D, "1,2,3", 5,"BRAIN")
     
-    
-    #self.makeModel(Brain3D, 1, 5,"CSF")
-    #self.makeModel(Brain3D, 2, 5,"GM")
-    #self.makeModel(Brain3D, 3, 5,"WM")
-    
-    #self.makeModel(electrodeslabelimage, 307, 5, "Electrodes")
+
 
     with open(self.electrodefilepath+"/electrodescordinatesFile.txt", 'r') as filehandle:
     
@@ -500,10 +462,7 @@ class InterfaceLogic(ScriptedLoadableModuleLogic):
               rowarray=[]
               slicenumarray=[]
           
-          #i = i+1
-              #print("Blank line")
-                  #AuxValues.append(currentPlace)
-      #print(i)
+
 
     filehandle.close()
 
@@ -541,46 +500,6 @@ class InterfaceLogic(ScriptedLoadableModuleLogic):
 
 
 
-
-
-
-
-    ############################################DESATIVEDFORTEST######################################################
-    
-    #elastix.exe -f ../Tmp/fixedtmp.nii -m ../Tmp/movingtmp.nii -out transform -p Parameters_Rigid.txt
-    #transformix.exe -tp transform/TransformParameters.0.txt -out result -in ../Tmp/movingtmp.nii
-    #print(cliParams)
-    #registration = volumesLogic.CloneVolume(slicer.mrmlScene, inputMRIVolume, 'Registration')
-    #self.tmpRobexInputFile = "..\\Tmp\\result\\result.mhd"
-    #self.tmpRobexOutputFile = "..\\Tmp\\outputtmp.nii"
-    #self.tmpOutputFile = os.path.dirname(__file__)+"/Tmp/outputtmp.nii"
-    
-    #self.saveNode(slicer.util.getNode(nameaux), self.tmpOutputFile)
-    #slicer.util.saveNode(slicer.util.getNode(nameaux), self.tmpOutputFile, properties)
-    #slicer.mrmlScene.RemoveNode(slicer.util.getNode(nameaux))
-    
-    #slicer.mrmlScene.RemoveNode(inputVolume)
-    #slicer.mrmlScene.RemoveNode(inputMRIVolume)
-
-    #self.RobexExecutable = os.path.dirname(__file__)+"\ROBEX"
-
-    #os.chdir(self.RobexExecutable)
-
-    #os.system("ROBEX.exe "+self.tmpRobexInputFile+" "+self.tmpRobexOutputFile)
-    
-    
-    #now = datetime.now()
-    #nameaux= "BRAIN_"+str(now.strftime("%m%d%Y_%H%M%S"))
-    #slicer.util.loadVolume(self.tmpRobexOutputFile, {'name': nameaux})
-    
-    
-    #logging.info(os.path.dirname(os.path.abspath(__file__))+"\ROBEX\ROBEX.exe")
-
-    #os.system("ROBEX.exe ..\Tmp\inputtmp.nii ..\Tmp\outputtmp.nii")
-    
-    # Capture screenshot
-    #if enableScreenshots:
-    #  self.takeScreenshot('InterfaceTest-Start','MyScreenshot',-1)
 
     logging.info('Processing completed')
 
